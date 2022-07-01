@@ -530,8 +530,8 @@ python pre_commit_defects() {
 }
 
 python __anonymous() {
-    if d.getVar("BBCLASSEXTEND"):
-        bb.fatal("coverity: incompatible with recipes utilizing BBCLASSEXTEND")
+    #if d.getVar("BBCLASSEXTEND"):
+    #    bb.fatal("coverity: incompatible with recipes utilizing BBCLASSEXTEND")
 
     if not d.getVar("COVERITY_ENABLE"):
         return
