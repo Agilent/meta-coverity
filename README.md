@@ -1,19 +1,10 @@
-This README file contains information on the contents of the meta-coverity layer.
+This layer is designed to make it easy to add Coverity static analysis to your Yocto builds. It supports committing defects to a Coverity Connect server, as well as viewing them locally.
 
-Please see the corresponding sections below for details.
 
-Dependencies
+
+Features
 ============
 
-  URI: <first dependency>
-  branch: <branch name>
-
-  URI: <second dependency>
-  branch: <branch name>
-
-  .
-  .
-  .
 
 Patches
 =======
@@ -35,7 +26,11 @@ I. Adding the meta-coverity layer to your build
 
 Run 'bitbake-layers add-layer meta-coverity'
 
-II. Misc
+License
 ========
 
---- replace with specific information about the meta-coverity layer ---
+This layer is licensed under the MIT license.
+
+Disclaimer
+========
+This is not an official Agilent or Synopsys product. No support is implied.
