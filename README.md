@@ -7,6 +7,12 @@ Prerequisites
 
 Coverity is a paid commerical product. You must have the appropriate license(s).
 
+Features
+============
+
+* Automatic integration with CMake-based recipes.
+
+
 Build system instructions 
 =========================
 
@@ -60,25 +66,59 @@ COVERITY_SERVER_STREAM:product-2 = "product-2"
 Recipe setup instructions
 =========================
 
+At a bare minimum each recipe that you want to be analyzed needs to have this line added:
 
+```
+inherit coverity
+```
 
+Try adding that line and then running `bitbake my-recipe -c coverity_export_defects`. If it works then you're probably good to go. Otherwise, consult the sections below for variables you can set to change how coverity.bbclass works.
+
+Integration strategies: `COVERITY_STRATEGY`
+=============================================
+
+The variable `COVERITY_STRATEGY` configures how coverity.bbclass attempts to integrate Coverity with your build. The available options are:
+
+* `auto` - default, explained below
+* `cmake` - overrides `OECMAKE_C_COMPILER` and `OECMAKE_CXX_COMPILER`  
+* `fs-capture-js` - runs Coverity in filesystem capture mode looking for .js files
+* `path-hijack` - manipulates the `PATH` environment variable so that our special trampoline compiler scripts are used instead of the actual compiler (explained more below)
+* `analyze-only` - only useful for image recipes (or other "aggregates") that don't actually build any source code themselves
+
+When `auto` is used the strategy is calculated as follows:
+* If the recipe uses CMake (i.e. `inherit cmake`), use `cmake`
+* If the recipe uses qmake from Qt5 (i.e. `inherit qmake5`), use `path-hijack`)
+* If the recipe is an image recipe, use `analyze-only`
+* Otherwise, error
+
+Makefile-based recipes are mostly untested, but should use the `path-hijack` strategy.
+
+Useful variables
+================
+
+Here are some variables you may want to tweak (either on a per-recipe basis, or local.conf/distro/layer wide):
+
+| Variable      | Description | Default |
+| ----------- | ----------- | ---- |
+| `COVERITY_ANALYZE_OPTIONS`      | Arguments passed to `cov-analyze`       | See coverity.bbclass |
+| `COVERITY_FS_CAPTURE_ARGS`      | Arguments passed to `cov-build` during filesystem capture       | `--fs-capture-search ${S}` |
+| `COVERITY_PARALLEL_BUILD` | The -j argument to pass to cov-build, e.g. '-j 4' | `${PARALLEL_MAKE}`, but reformatted to add the space in between -j and the number |
+| `COVERITY_CONFIGURE_COMPILERS` | Compilers to run `cov-configure` on. | `${HOST_PREFIX}gcc` if gcc, `${HOST_PREFIX}clang` if clang |
+| `COVERITY_TRAMPOLINES` | Compilers for which to generate trampoline scripts that interpose compilation. | `${COVERITY_CONFIGURE_COMPILERS} ${HOST_PREFIX}g++` if gcc, `${COVERITY_CONFIGURE_COMPILERS} ${HOST_PREFIX}clang++` if clang  |
+| `COVERITY_ANALYZE_RECURSIVE_OPTIONS`   | TODO explain | *empty* |
+| `COVERITY_EXPORT_DEFECTS_XREF` | When set to `"1"`, run cross-referencing during `do_coverity_export_defects` and `do_coverity_export_defects_all`. This passes `-x` to `cov-format-errors`. | `""` (off) | 
 
 Limitations and TODOs
 =====================
 
 Feel free to submit PRs!
 
+If you encounter issues, submit them and I'll do my best to look at the failure (though I don't have unlimited time to troubleshoot integrations).
+
 * Kernel recipes are not tested
 * Doesn't yet support native and nativesdk recipes (do_coverity_configure will probably fail)
 * Encryption when commiting defects is currently disabled (due a bug in a previous version of Coverity that I haven't re-tested yet to see if fixed)
 * Port for committing defects is hardcoded to 9090
-* 
-
-Features
-============
-
-* Automatic integration with CMake-based recipes.
-
 
 License
 ========
