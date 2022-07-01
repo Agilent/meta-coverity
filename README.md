@@ -2,6 +2,8 @@ This layer is designed to make it easy to add Coverity static analysis to your Y
 
 **Current supported version**: 2022.6.0
 
+This layer uses the new BitBake override syntax and poky variable names, so it only supports the Kirkstone and Langdale releases of Yocto.
+
 Prerequisites
 ============
 
