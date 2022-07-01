@@ -10,8 +10,14 @@ Coverity is a paid commerical product. You must have the appropriate license(s).
 Features
 ============
 
-* Automatic integration with CMake-based recipes.
-
+* Automatic integration with several kinds of recipes (CMake, qmake5, and image)
+* Supports gcc and clang
+* Automatically aggregates translation units across the entire BitBake task graph (i.e. if you are analyzing recipe A, which depends on B, C, and D, then assuming all four are setup to use Coverity, translation units from all four are factored into the analysis).
+* Build capture is setscene optimized
+* Easy export of defects to local .html files
+* Supports comitting defects to Coverity Connect server
+* Customizable stream name
+* Detailed progress capture for `cov-analyze`
 
 Build system instructions 
 =========================
@@ -72,7 +78,7 @@ At a bare minimum each recipe that you want to be analyzed needs to have this li
 inherit coverity
 ```
 
-Try adding that line and then running `bitbake my-recipe -c coverity_export_defects`. If it works then you're probably good to go. Otherwise, consult the sections below for variables you can set to change how coverity.bbclass works.
+Try adding that line and then running `bitbake my-recipe -c coverity_export_defects`. If it works then you're probably good to go. Otherwise, consult the sections below for variables you can set to change how coverity.bbclass works. The first thing to check is whether you need a different integration strategy.
 
 Integration strategies: `COVERITY_STRATEGY`
 =============================================
@@ -107,6 +113,11 @@ Here are some variables you may want to tweak (either on a per-recipe basis, or 
 | `COVERITY_TRAMPOLINES` | Compilers for which to generate trampoline scripts that interpose compilation. | `${COVERITY_CONFIGURE_COMPILERS} ${HOST_PREFIX}g++` if gcc, `${COVERITY_CONFIGURE_COMPILERS} ${HOST_PREFIX}clang++` if clang  |
 | `COVERITY_ANALYZE_RECURSIVE_OPTIONS`   | TODO explain | *empty* |
 | `COVERITY_EXPORT_DEFECTS_XREF` | When set to `"1"`, run cross-referencing during `do_coverity_export_defects` and `do_coverity_export_defects_all`. This passes `-x` to `cov-format-errors`. | `""` (off) | 
+
+Internals
+=========
+
+
 
 Limitations and TODOs
 =====================
