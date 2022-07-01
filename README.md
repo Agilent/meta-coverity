@@ -119,20 +119,20 @@ Here are some variables you may want to tweak (either on a per-recipe basis, or 
 Internals
 =========
 
-##Basic principles
+## Basic principles
 
 While Coverity documentation generally suggests using `cov-build` in "Build capture" mode, that is not feasible for BitBake/Yocto. BitBake spawns worker processes in a way that `cov-build` cannot follow. Even if it could follow, the analysis results would likely not be complete due to BitBake's optimizations such as setscene. Moreover, we are probably not interested in the analysis of every single dependency of the system anyway.
 
 coverity.bbclass takes a more surgical approach. It uses `cov-translate` as described in section 3.3.3 of the "Coverity Analysis 2020.06 User and Administrator
 Guide". 
 
-##Compiler trampolines
+## Compiler trampolines
 
 At a high level, coverity.bbclass works by manipulating the build environment in such a way that instead of the actual compiler getting called, a special trampoline script is called. This trampoline script is a thin wrapper around `cov-translate`. `cov-translate`, behind the scenes, invokes the real compiler. It also records the arguments that were passed to the compiler. 
 
 Later on, during the `do_coverity_build` task, Coverity goes over what `cov-translate` emitted and produces its intermediate data that will later be fed into `cov-analyze`.
 
-##Tasks
+## Tasks
 
 coverity.bbclass adds the following BitBake tasks to recipes:
 
