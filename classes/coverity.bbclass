@@ -62,7 +62,7 @@ COVERITY_ANALYZE_RECURSIVE_OPTIONS ?= ""
 COVERITY_CONFIGURE_COMPILERS ?= " \
     ${HOST_PREFIX}gcc \
 "
-COVERITY_CONFIGURE_COMPILERS_toolchain-clang ?= " \
+COVERITY_CONFIGURE_COMPILERS:toolchain-clang ?= " \
     ${HOST_PREFIX}clang \
 "
 
@@ -70,14 +70,14 @@ COVERITY_TRAMPOLINES ?= " \
     ${COVERITY_CONFIGURE_COMPILERS} \
     ${HOST_PREFIX}g++ \
 "
-COVERITY_TRAMPOLINES_toolchain-clang ?= " \
+COVERITY_TRAMPOLINES:toolchain-clang ?= " \
     ${COVERITY_CONFIGURE_COMPILERS} \
     ${HOST_PREFIX}clang++ \
 "
 COVERITY_TRAMPOLINES[doc] = "Compilers whose invocations will be intercepted. Doesn't normally needed to be changed."
 
 COVERITY_COMPTYPE ?= "gcc"
-COVERITY_COMPTYPE_toolchain-clang ?= "clangcc"
+COVERITY_COMPTYPE:toolchain-clang ?= "clangcc"
 
 COVERITY_REAL_COMPILER_DIR ??= "${STAGING_BINDIR_TOOLCHAIN}"
 COVERITY_REAL_COMPILER_DIR[doc] = "Location of the actual compiler binaries. Doesn't normally needed to be changed."
@@ -111,7 +111,7 @@ SSTATE_DUPWHITELIST += "${COVERITY_EMIT_DEPLOY}"
 
 BB_SIGNATURE_EXCLUDE_FLAGS += "covprogress-triggerword covprogress-indeterminate covprogress-commitsubstatus"
 
-PATH_prepend ="${COVERITY_NATIVE_PATH}/bin:"
+PATH:prepend ="${COVERITY_NATIVE_PATH}/bin:"
 
 coverity_configure_impl() {
     cp -r ${COVERITY_NATIVE_PATH}/dtd ${COVERITY_WORKDIR}
@@ -570,9 +570,9 @@ python __anonymous() {
         bb.build.addtask("do_coverity_configure", "do_generate_toolchain_file", "do_prepare_recipe_sysroot", d)
         d.appendVar("EXTRA_OECMAKE", " --debug-output")
         d.setVar("OECMAKE_C_COMPILER", "${COVERITY_TRAMPOLINE_DIR}/${HOST_PREFIX}gcc")
-        d.setVar("OECMAKE_C_COMPILER_toolchain-clang", "${COVERITY_TRAMPOLINE_DIR}/${HOST_PREFIX}clang")
+        d.setVar("OECMAKE_C_COMPILER:toolchain-clang", "${COVERITY_TRAMPOLINE_DIR}/${HOST_PREFIX}clang")
         d.setVar("OECMAKE_CXX_COMPILER", "${COVERITY_TRAMPOLINE_DIR}/${HOST_PREFIX}g++")
-        d.setVar("OECMAKE_CXX_COMPILER_toolchain-clang", "${COVERITY_TRAMPOLINE_DIR}/${HOST_PREFIX}clang++")
+        d.setVar("OECMAKE_CXX_COMPILER:toolchain-clang", "${COVERITY_TRAMPOLINE_DIR}/${HOST_PREFIX}clang++")
 
         # Modify do_configure to inject the DISABLE_COVERITY_TRAMPOLINE env variable
         if d.getVarFlag("do_configure", "python", False):
