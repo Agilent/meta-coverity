@@ -117,7 +117,34 @@ Here are some variables you may want to tweak (either on a per-recipe basis, or 
 Internals
 =========
 
+##Basic principles
 
+While Coverity documentation generally suggests using `cov-build` in "Build capture" mode, that is not feasible for BitBake/Yocto. BitBake spawns worker processes in a way that `cov-build` cannot follow. Even if it could follow, the analysis results would likely not be complete due to BitBake's optimizations such as setscene. Moreover, we are probably not interested in the analysis of every single dependency of the system anyway.
+
+coverity.bbclass takes a more surgical approach. It uses `cov-translate` as described in section 3.3.3 of the "Coverity Analysis 2020.06 User and Administrator
+Guide". 
+
+##Compiler trampolines
+
+At a high level, coverity.bbclass works by manipulating the build environment in such a way that instead of the actual compiler getting called, a special trampoline script is called. This trampoline script is a thin wrapper around `cov-translate`. `cov-translate`, behind the scenes, invokes the real compiler. It also records the arguments that were passed to the compiler. 
+
+Later on, during the `do_coverity_build` task, Coverity goes over what `cov-translate` emitted and produces its intermediate data that will later be fed into `cov-analyze`.
+
+##Tasks
+
+coverity.bbclass adds the following BitBake tasks to recipes:
+
+| Task      | Description | Notes |
+| ----------- | ----------- | ---- |
+| `do_coverity_configure` | Runs `cov-configure` on compilers and generates trampoline scripts |  |
+| `do_coverity_build` | Consumes information emitted during the `do_compile` and produces intermediate data. Filesystem capture is done here as well for JavaScript. |  |
+| `do_coverity_prepare_analysis` | Assembles the analysis intermediate directory | This works by using the BitBake `[recrdeptask]` varflag set to `do_coverity_build`. |
+| `do_coverity_analyze` | Runs `cov-analyze` | |
+| `do_coverity_export_defects` | Produces a local .html version of detected defects (using `cov-emit-defects`) for just the current recipe | Filtering is applied to exclude any results that fall under the recipe's sysroot. Note that the filtering is imperfect, so defects may be erroneously included/excluded. |
+| `do_coverity_export_defects_all` | Produces a local .html version of detected defects (using `cov-emit-defects`) across current recipe and all dependencies | |
+| `do_coverity_commit_defects` | Commits defects to the Coverity Connect server | |
+
+The only tasks you should need to run manually are the last three.
 
 Limitations and TODOs
 =====================
