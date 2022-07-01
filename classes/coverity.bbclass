@@ -413,6 +413,14 @@ do_coverity_prepare_analysis[recideptask] = "do_${BB_DEFAULT_TASK}"
 do_coverity_prepare_analysis[depends] += "bc-native:do_populate_sysroot"
 
 coverity_analyze_impl() {
+    if [ ! -e "${COVERITY_ANALYSIS_LIC}" ]; then
+        if [ -z "${COVERITY_ANALYSIS_LIC}" ]; then
+            bbfatal "COVERITY_ANALYSIS_LIC variable is not set"
+        else
+            bbfatal "Couldn't find analysis license file: ${COVERITY_ANALYSIS_LIC}"
+        fi
+    fi
+
     cov-analyze \
         ${COVERITY_INTERNAL_ANALYZE_STRIP_PATH_FLAGS} \
         --ticker-mode no-spin \
@@ -502,6 +510,23 @@ do_coverity_export_all_defects[cleandirs] += "${WORKDIR}/coverity-defects"
 do_coverity_export_all_defects[umask] = "022"
 
 do_coverity_commit_defects() {
+    if [ ! -e "${COVERITY_AUTH_KEY_FILE}" ]; then
+        if [ -z "${COVERITY_AUTH_KEY_FILE}" ]; then
+            bbfatal "COVERITY_AUTH_KEY_FILE variable is not set"
+        else
+            bbfatal "Couldn't find authentication key file: ${COVERITY_AUTH_KEY_FILE}"
+        fi
+    fi
+
+    if [ -z "${COVERITY_SERVER_HOST}" ]; then
+        bbfatal "COVERITY_SERVER_HOST variable is not set"
+    fi
+
+    if [ -z "${COVERITY_SERVER_STREAM}" ]; then
+        bbfatal "COVERITY_SERVER_STREAM variable is not set"
+    fi
+
+
     cov-commit-defects \
         --dir "${COVERITY_ANALYSIS_IDIR}" \
         --security-file "${COVERITY_ANALYSIS_LIC}" \
