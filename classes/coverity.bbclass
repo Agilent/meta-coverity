@@ -455,8 +455,9 @@ python do_coverity_analyze() {
 do_coverity_analyze[covprogress-triggerword] = "Running analysis"
 do_coverity_analyze[dirs] =+ "${COVERITY_COMMON_DIRS} ${COVERITY_ANALYSIS_IDIR} ${COVERITY_ANALYSIS_COMPONENT_IDIRS}"
 do_coverity_analyze[umask] = "022"
-# cov-analyze is very heavyweight so there is not point in running them concurrently (e.g. across multiconfigs)
+# cov-analyze is very heavyweight so there is no point in running them concurrently (e.g. across multiconfigs)
 do_coverity_analyze[lockfiles] += "${PERSISTENT_DIR}/coverity-analysis.lock"
+do_coverity_analyze[network] = "1"
 
 export_defects_impl() {
     cov-format-errors \
@@ -521,6 +522,7 @@ do_coverity_commit_defects[progress] = "custom:CovBuildProgressHandler"
 do_coverity_commit_defects[covprogress-indeterminate] = "1"
 do_coverity_commit_defects[covprogress-commitsubstatus] = "1"
 do_coverity_commit_defects[nostamp] = "1"
+do_coverity_commit_defects[network] = "1"
 
 python pre_commit_defects() {
     # Bail if any components are under externalsrc
