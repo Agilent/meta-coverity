@@ -163,6 +163,8 @@ If you encounter issues, submit them and I'll do my best to look at the failure 
 License
 ========
 
+Copyright 2022 Agilent Technologies, Inc.
+
 This layer is licensed under the MIT license.
 
 Disclaimer
