@@ -121,8 +121,8 @@ coverity_configure_impl() {
     if [ "${COVERITY_STRATEGY}" = "fs-capture-js" ]; then
         cov-configure \
             --javascript \
-            --config ${COVERITY_CONFIG_FILE} \
-            --tmpdir ${COVERITY_TMP_DIR}
+            --config "${COVERITY_CONFIG_FILE}" \
+            --tmpdir "${COVERITY_TMP_DIR}"
     else
         compilers="${@" ".join([compiler for compiler in (d.getVar("COVERITY_CONFIGURE_COMPILERS") or "").split()])}"
         for compiler in ${compilers}; do
@@ -173,15 +173,15 @@ def create_trampolines(compilers, bb, d):
                     --run-compile \\
                     --record-with-source \\
                     --force \\
-                    --dir ${COVERITY_IDIR} \\
+                    --dir "${COVERITY_IDIR}" \\
                     --emulate-string ^-dump.* \\
                     --emulate-string ^-E.* \\
                     --emulate-string ^--help.* \\
                     --emulate-string ^-print.* \\
                     --emulate-string ^--target-help.* \\
                     --emulate-string ^--version.* \\
-                    --config ${COVERITY_CONFIG_FILE} \\
-                    --tmpdir ${COVERITY_TMP_DIR} \\
+                    --config "${COVERITY_CONFIG_FILE}" \\
+                    --tmpdir "${COVERITY_TMP_DIR}" \\
                     ${COVERITY_REAL_COMPILER_DIR}/{compiler} \\
                     "$@"
             fi
@@ -217,8 +217,8 @@ do_coverity_build() {
     if [ "${COVERITY_STRATEGY}" = "fs-capture-js" ]; then
         cov-build \
             --no-command \
-            --config ${COVERITY_CONFIG_FILE} \
-            --dir ${COVERITY_IDIR} \
+            --config "${COVERITY_CONFIG_FILE}" \
+            --dir "${COVERITY_IDIR}" \
             ${COVERITY_FS_CAPTURE_ARGS}
     else
         ret=0
@@ -227,10 +227,10 @@ do_coverity_build() {
             --add-arg '--ticker-mode no-spin' \
             --force \
             --return-emit-failures \
-            --config ${COVERITY_CONFIG_FILE} \
+            --config "${COVERITY_CONFIG_FILE}" \
             --replay-from-emit \
-            --dir ${COVERITY_IDIR} \
-            --tmpdir ${COVERITY_TMP_DIR} \
+            --dir "${COVERITY_IDIR}" \
+            --tmpdir "${COVERITY_TMP_DIR}" \
             || ret=$?
 
         logfile="${WORKDIR}/temp/log.${@d.getVar("BB_RUNTASK")}"
@@ -242,9 +242,9 @@ do_coverity_build() {
         cov-build \
             ${COVERITY_PARALLEL_BUILD} \
             --add-arg '--ticker-mode no-spin' \
-            --config ${COVERITY_CONFIG_FILE} \
-            --dir ${COVERITY_IDIR} \
-            --tmpdir ${COVERITY_TMP_DIR} \
+            --config "${COVERITY_CONFIG_FILE}" \
+            --dir "${COVERITY_IDIR}" \
+            --tmpdir "${COVERITY_TMP_DIR}" \
             --finalize
     fi
 
@@ -268,7 +268,7 @@ do_coverity_build() {
         --dir ${COVERITY_IDIR} \
         --scm git
 }
-
+do_coverity_build[recrdeptask] = "do_coverity_configure"
 do_coverity_build[postfuncs] += "record_coverity_build_info"
 
 python record_coverity_build_info() {
@@ -368,29 +368,29 @@ coverity_prepare_analysis_impl() {
         cp -r ${COVERITY_EMIT_DEPLOY}/${pn} ${COVERITY_ANALYSIS_COMPONENT_IDIRS}
 
         cov-manage-emit \
-            --dir ${COVERITY_ANALYSIS_COMPONENT_IDIRS}/${pn} \
-            --config ${COVERITY_CONFIG_FILE} \
+            --dir "${COVERITY_ANALYSIS_COMPONENT_IDIRS}/${pn}" \
+            --config "${COVERITY_CONFIG_FILE}" \
             reset-host-name
 
         cov-manage-emit \
-            --dir ${COVERITY_ANALYSIS_IDIR} \
-            --config ${COVERITY_CONFIG_FILE} \
+            --dir "${COVERITY_ANALYSIS_IDIR}" \
+            --config "${COVERITY_CONFIG_FILE}" \
             add ${COVERITY_ANALYSIS_COMPONENT_IDIRS}/${pn}
 
         # For debug purposes - list the source files in the component's idir for which Coverity has SCM information.
         cov-manage-emit \
-           --dir ${COVERITY_ANALYSIS_COMPONENT_IDIRS}/${pn} \
-           --config ${COVERITY_CONFIG_FILE} \
+           --dir "${COVERITY_ANALYSIS_COMPONENT_IDIRS}/${pn}" \
+           --config "${COVERITY_CONFIG_FILE}" \
            list-scm-known
 
         # Transfer the components SCM information into the shared analysis idir.
 		cov-manage-emit \
-           --dir ${COVERITY_ANALYSIS_COMPONENT_IDIRS}/${pn} \
-           --config ${COVERITY_CONFIG_FILE} \
+           --dir "${COVERITY_ANALYSIS_COMPONENT_IDIRS}/${pn}" \
+           --config "${COVERITY_CONFIG_FILE}" \
            dump-scm-annotations --output - \
         | cov-manage-emit \
-           --dir ${COVERITY_ANALYSIS_IDIR} \
-           --config ${COVERITY_CONFIG_FILE} \
+           --dir "${COVERITY_ANALYSIS_IDIR}" \
+           --config "${COVERITY_CONFIG_FILE}" \
            add-scm-annotations --input -
     done
 }
