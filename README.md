@@ -114,7 +114,7 @@ Here are some variables you may want to tweak (either on a per-recipe basis, or 
 | `COVERITY_CONFIGURE_COMPILERS` | Compilers to run `cov-configure` on. | `${HOST_PREFIX}gcc` if gcc, `${HOST_PREFIX}clang` if clang |
 | `COVERITY_TRAMPOLINES` | Compilers for which to generate trampoline scripts that interpose compilation. | `${COVERITY_CONFIGURE_COMPILERS} ${HOST_PREFIX}g++` if gcc, `${COVERITY_CONFIGURE_COMPILERS} ${HOST_PREFIX}clang++` if clang  |
 | `COVERITY_ANALYZE_RECURSIVE_OPTIONS`   | TODO explain | *empty* |
-| `COVERITY_EXPORT_DEFECTS_XREF` | When set to `"1"`, run cross-referencing during `do_coverity_export_defects` and `do_coverity_export_defects_all`. This passes `-x` to `cov-format-errors`. | `""` (off) | 
+| `COVERITY_EXPORT_DEFECTS_XREF` | When set to `"1"`, run cross-referencing during `do_coverity_export_defects` and `do_coverity_export_all_defects`. This passes `-x` to `cov-format-errors`. | `""` (off) | 
 
 Internals
 =========
@@ -143,7 +143,7 @@ coverity.bbclass adds the following BitBake tasks to recipes:
 | `do_coverity_prepare_analysis` | Assembles the analysis intermediate directory | This works by using the BitBake `[recrdeptask]` varflag set to `do_coverity_build`. |
 | `do_coverity_analyze` | Runs `cov-analyze` | |
 | `do_coverity_export_defects` | Produces a local .html version of detected defects (using `cov-emit-defects`) for just the current recipe | Filtering is applied to exclude any results that fall under the recipe's sysroot. Note that the filtering is imperfect, so defects may be erroneously included/excluded. |
-| `do_coverity_export_defects_all` | Produces a local .html version of detected defects (using `cov-emit-defects`) across current recipe and all dependencies | |
+| `do_coverity_export_all_defects` | Produces a local .html version of detected defects (using `cov-emit-defects`) across current recipe and all dependencies | |
 | `do_coverity_commit_defects` | Commits defects to the Coverity Connect server | |
 
 The only tasks you should need to run manually are the last three.
