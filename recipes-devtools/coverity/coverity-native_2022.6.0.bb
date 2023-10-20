@@ -46,7 +46,7 @@ do_install () {
     rm ${D}${datadir}/coverity/bin/libjnidispatch.so
 }
 
-INSANE_SKIP:${PN} = "already-stripped"
+INSANE_SKIP_${PN} = "already-stripped"
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 
